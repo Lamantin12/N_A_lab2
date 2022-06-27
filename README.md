@@ -1,0 +1,1 @@
+# Lab 2 of my numerical analisys course
