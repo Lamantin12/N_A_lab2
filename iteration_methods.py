@@ -12,6 +12,8 @@ class iteration_method:
         self.alpha = []
         self.q = []
         self.epsilon = []
+        self.result = []
+        self.t_result = []
 
         for i in range(len(self.A)):
             x_range = linspace(self.A[i], self.B[i], 1000)
@@ -20,8 +22,6 @@ class iteration_method:
             self.alpha.append(2 / (self.M1[i] + self.m1[i]))
             self.q.append(abs(self.M1[i] - self.m1[i]) / abs(self.M1[i] + self.m1[i]))
             self.epsilon.append((1 - self.q[i]) / self.q[i] * eps)
-            self.result = []
-            self.t_result = []
 
     def fit(self):
         for i in range(len(self.A)):
