@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 class newton_method:
     def __init__(self, func, func_derivative, left_dots, right_dots):
         self.function = func
@@ -12,36 +11,39 @@ class newton_method:
         self.result_t = []
         self.epsilon = 0
 
-    def fit(self, method, eps=10**(-12), stop=1000):
+    def fit(self, method, eps=10**(-12), **kwargs):
         self.epsilon = eps
         self.method = method
 
         if self.method == 'standard':
             for i in range(len(self.A)):
                 center = (self.A[i] + self.B[i]) / 2
-                res = self.standard_newton(center, stop)
+                res = self.standard_newton(center)
                 self.result.append(res[0])
                 self.result_t.append(res[1])
         elif self.method == 'simple':
             for i in range(len(self.A)):
                 center = (self.A[i] + self.B[i]) / 2
-                res = self.simple_newton(center, stop)
+                res = self.simple_newton(center)
                 self.result.append(res[0])
                 self.result_t.append(res[1])
         elif self.method == 'standard_with_residue':
             center = (self.A[0] + self.B[0]) / 2
-            self.result = self.standard_newton_residual(center, stop)
+            self.result = self.standard_newton_residual(center, kwargs['stop'])
         elif self.method == 'simple_with_residue':
             center = (self.A[0] + self.B[0]) / 2
-            self.result = self.simple_newton_residual(center, stop)
+            self.result = self.simple_newton_residual(center,kwargs['stop'])
         elif self.method == 'multiple':
-            # self.standard_newton(center, stop)
-            pass
+            center = (self.A[0] + self.B[0]) / 2
+            for i in range(1, kwargs['multiple_edge']):
+                res = self.newton_for_nultiple(center,i)
+                self.result.append(res[0])
+                self.result_t.append(res[1])
         else:
             print('Cannot fit model, you entered wrong method, try standard/simple/multiple/standard_with_residue/simple_with_residue')
             return
 
-    def standard_newton(self, x, endpoint):
+    def standard_newton(self, x, endpoint=1000):
         t = 1
         x_k = x - (self.function(x)) / (self.function_derivative(x))
         while (abs(x_k - x) > self.epsilon) and (t < endpoint):
@@ -50,7 +52,7 @@ class newton_method:
             t += 1
         return [x_k, t]
 
-    def simple_newton(self, x, endpoint):
+    def simple_newton(self, x, endpoint=1000):
         t = 1
         df = self.function_derivative(x)
         x_k = x - (self.function(x)) / self.function_derivative(x)
@@ -84,6 +86,15 @@ class newton_method:
             t += 1
             r.append(abs(self.function(x_k)))
         return r
+
+    def newton_for_nultiple(self, x, m):
+        x_k = x - m * self.function(x) / self.function_derivative(x)
+        t = 1
+        while (abs(x_k - x) > self.epsilon):
+            x = x_k
+            x_k = x - m * self.function(x) / self.function_derivative(x)
+            t += 1
+        return [x_k, t]
 
     def display_result(self):
         if len(self.result) != 0:
